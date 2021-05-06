@@ -1,9 +1,13 @@
 version: 2.1
+
+orbs:
+  aws-s3: circleci/aws-s3@2.0.0
+
 jobs: # we have jobs, so that a workflow can coordinate them!
-  build: # job name 
+  build: # job name
     docker: # it uses the docker executor
-      - image: circleci/node:14  # specifically, a docker image circleci/node:14
-     # Steps are a list of commands to run inside the docker container above.
+      - image: circleci/node:14 # specifically, a docker image circleci/node:14
+      # Steps are a list of commands to run inside the docker container above.
     steps:
       - checkout # this pulls code down from GitHub
       - run: echo "Hello SoftTeco"
@@ -19,3 +23,8 @@ jobs: # we have jobs, so that a workflow can coordinate them!
       - run:
           name: build project
           command: npm run build
+      - aws-s3/sync:
+          arguments: |
+            --acl public-read
+          from: build/
+          to: "s3://softteco-ci"
